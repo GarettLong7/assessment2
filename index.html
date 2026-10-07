@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Anime Tracker</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <h1>My Anime Tracker</h1>
+
+  <form id="anime-form">
+    <input
+      type="text"
+      id="anime-title"
+      placeholder="Anime title"
+      required
+    >
+
+    <select id="anime-status">
+      <option value="Watching">Watching</option>
+      <option value="Completed">Completed</option>
+      <option value="Plan to Watch">Plan to Watch</option>
+    </select>
+
+    <input
+      type="number"
+      id="anime-rating"
+      placeholder="Rating"
+      min="1"
+      max="10"
+    >
+
+    <button type="submit">Add Anime</button>
+  </form>
+
+
+  <h2>My List</h2>
+
+  <div id="anime-list">
+    <!-- JavaScript will add anime here -->
+  </div>
+
+
+  <script src="script.js"></script>
+</body>
+</html>
