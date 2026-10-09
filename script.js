@@ -1,5 +1,11 @@
 const animeList = [];
 
+const animeForm = document.querySelector("#anime-form");
+const titleInput = document.querySelector("#anime-title");
+const statusInput = document.querySelector("#anime-status");
+const ratingInput = document.querySelector("#anime-rating");
+const listContainer = document.querySelector("#anime-list");
+
 function addAnime(title, status, rating) {
   const anime = {
     id: Date.now(),
@@ -9,6 +15,51 @@ function addAnime(title, status, rating) {
   };
 
   animeList.push(anime);
-
   return anime;
 }
+
+function displayAnime() {
+  // Clear the display before rebuilding it.
+  listContainer.textContent = "";
+
+  animeList.forEach(function (anime) {
+    const card = document.createElement("div");
+    card.className = "anime-card";
+
+    const title = document.createElement("h3");
+    title.textContent = anime.title;
+
+    const status = document.createElement("p");
+    status.textContent = "Status: " + anime.status;
+
+    const rating = document.createElement("p");
+    rating.textContent =
+      "Rating: " + (anime.rating === "" ? "Not rated" : anime.rating + "/10");
+
+    card.append(title, status, rating);
+    listContainer.append(card);
+  });
+}
+
+animeForm.addEventListener("submit", function (event) {
+  // Prevent the form from refreshing the page.
+  event.preventDefault();
+
+  const title = titleInput.value.trim();
+
+  if (title === "") {
+    titleInput.setCustomValidity("Please enter an anime title.");
+    titleInput.reportValidity();
+    return;
+  }
+
+  addAnime(title, statusInput.value, ratingInput.value);
+  displayAnime();
+
+  animeForm.reset();
+  titleInput.focus();
+});
+
+titleInput.addEventListener("input", function () {
+  titleInput.setCustomValidity("");
+});
