@@ -86,7 +86,7 @@ animeForm.addEventListener("submit", function (event) {
   }
 
   // Save both additions and edits if you're using localStorage.
-  localStorage.setItem("animeList", JSON.strinify(animeList));
+  localStorage.setItem("animeList", JSON.stringify(animeList));
 
   displayAnime();
   animeForm.reset();
