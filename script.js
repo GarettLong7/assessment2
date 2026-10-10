@@ -6,6 +6,9 @@ const statusInput = document.querySelector("#anime-status");
 const ratingInput = document.querySelector("#anime-rating");
 const listContainer = document.querySelector("#anime-list");
 
+const submitButton = document.querySelector("#submit-button");
+let editingId = null;
+
 function addAnime(title, status, rating) {
   const anime = {
     id: Date.now(),
@@ -36,8 +39,23 @@ function displayAnime() {
     rating.textContent =
       "Rating: " + (anime.rating === "" ? "Not rated" : anime.rating + "/10");
 
-    card.append(title, status, rating);
-    listContainer.append(card);
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.textContent = "Edit";
+
+    editButton.addEventListener("click", function () {
+      editingId = anime.id;
+
+      titleInput.value = anime.title;
+      statusInput.value = anime.status;
+      ratingInput.value = anime.rating;
+
+      titleInput.setCustomValidity("");
+      submitButton.textContent = "Save Changes";
+      titleInput.focus();
+    });
+
+    card.append(title, status, rating, editButton);
   });
 }
 
@@ -53,10 +71,26 @@ animeForm.addEventListener("submit", function (event) {
     return;
   }
 
-  addAnime(title, statusInput.value, ratingInput.value);
-  displayAnime();
+  if (editingId === null) {
+    addAnime(title, statusInput.value, ratingInput.value);
+  } else {
+    const anime = animeList.find(function (anime) {
+      return anime.id === editingId;
+    });
 
+    anime.title = title;
+    anime.status = statusInput.value;
+    anime.rating = ratingInput.value;
+
+    editingId = null;
+  }
+
+  // Save both additions and edits if you're using localStorage.
+  localStorage.setItem("animeList", JSON.strinify(animeList));
+
+  displayAnime();
   animeForm.reset();
+  submitButton.textContent = "Add Anime";
   titleInput.focus();
 });
 
