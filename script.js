@@ -34,6 +34,17 @@ function addAnime(title, status, rating) {
   animeList.push(anime);
 }
 
+if (editingId === null) {
+  addAnime(title, statusInput.value, ratingInput.value);
+
+  postData(title, statusInput.value, ratingInput.value)
+    .catch(function (error) {
+      console.error("POST failed:", error);
+    });
+} else {
+  updateAnime(title, statusInput.value, ratingInput.value);
+}
+
 // Fill the form with the selected anime's details.
 function editAnime(anime) {
   editingId = anime.id;
@@ -116,6 +127,10 @@ function createAnimeCard(anime) {
 function displayAnime() {
   listContainer.textContent = "";
 
+  if (animeList.length === 0) {
+    listContainer.textContent = "No anime yet. Add your first anime above!";
+  }
+
   animeList.forEach(function (anime) {
     const card = createAnimeCard(anime);
     listContainer.append(card);
@@ -145,6 +160,25 @@ animeForm.addEventListener("submit", function (event) {
   resetForm();
   titleInput.focus();
 });
+
+async function getData() {
+  const response = await axios.get("https://jsonplaceholder.typicode.com/posts/1")
+  const data = response.data;
+  console.log(data)
+}
+
+async function postData(title, status, rating) {
+  const response = await axios.post(
+    "https://jsonplaceholder.typicode.com/posts",
+    {
+      title: title,
+      body: status + ", rating: " + rating,
+      userId: 1
+    }
+  );
+
+console.log(response.data);
+}
 
 // Clear the custom error when the title is edited.
 titleInput.addEventListener("input", function () {
