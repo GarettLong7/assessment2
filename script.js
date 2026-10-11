@@ -34,17 +34,6 @@ function addAnime(title, status, rating) {
   animeList.push(anime);
 }
 
-if (editingId === null) {
-  addAnime(title, statusInput.value, ratingInput.value);
-
-  postData(title, statusInput.value, ratingInput.value)
-    .catch(function (error) {
-      console.error("POST failed:", error);
-    });
-} else {
-  updateAnime(title, statusInput.value, ratingInput.value);
-}
-
 // Fill the form with the selected anime's details.
 function editAnime(anime) {
   editingId = anime.id;
@@ -137,6 +126,30 @@ function displayAnime() {
   });
 }
 
+// GET: request data from the practice API.
+async function getData() {
+  const response = await axios.get(
+    "https://jsonplaceholder.typicode.com/posts/1"
+  );
+
+  console.log(response.data);
+}
+
+// POST: send anime details to the practice API.
+// This API simulates saving; localStorage saves your actual list.
+async function postData(title, status, rating) {
+  const response = await axios.post(
+    "https://jsonplaceholder.typicode.com/posts",
+    {
+      title: title,
+      body: status + ", rating: " + rating,
+      userId: 1
+    }
+  );
+
+  console.log(response.data);
+}
+
 // Add or update an anime when the form is submitted.
 animeForm.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -151,6 +164,11 @@ animeForm.addEventListener("submit", function (event) {
 
   if (editingId === null) {
     addAnime(title, statusInput.value, ratingInput.value);
+
+    postData(title, statusInput.value, ratingInput.value)
+      .catch(function (error) {
+        console.error("POST failed:", error);
+      });
   } else {
     updateAnime(title, statusInput.value, ratingInput.value);
   }
@@ -161,25 +179,6 @@ animeForm.addEventListener("submit", function (event) {
   titleInput.focus();
 });
 
-async function getData() {
-  const response = await axios.get("https://jsonplaceholder.typicode.com/posts/1")
-  const data = response.data;
-  console.log(data)
-}
-
-async function postData(title, status, rating) {
-  const response = await axios.post(
-    "https://jsonplaceholder.typicode.com/posts",
-    {
-      title: title,
-      body: status + ", rating: " + rating,
-      userId: 1
-    }
-  );
-
-console.log(response.data);
-}
-
 // Clear the custom error when the title is edited.
 titleInput.addEventListener("input", function () {
   titleInput.setCustomValidity("");
@@ -187,3 +186,8 @@ titleInput.addEventListener("input", function () {
 
 // Display saved anime when the page opens.
 displayAnime();
+
+// Run the GET request when the page opens.
+getData().catch(function (error) {
+  console.error("GET failed:", error);
+});
