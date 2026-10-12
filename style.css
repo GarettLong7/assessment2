@@ -1,23 +1,48 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
   background-color: #f5f5f5;
+  color: #222;
 }
 
-h1 {
-  text-align: center;
-}
-
+h1,
 h2 {
   text-align: center;
 }
 
+/* Add Anime form */
 #anime-form {
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+  max-width: 900px;
+  margin: 25px auto;
 }
 
+#anime-form input,
+#anime-form select,
+#anime-form button {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-width: 100%;
+}
+
+#anime-form #submit-button {
+  background-color: #2458a6;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+
+/* Anime list */
 #anime-list {
   max-width: 600px;
   margin: 30px auto;
@@ -28,16 +53,106 @@ h2 {
   background-color: white;
   padding: 15px;
   margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow-wrap: anywhere;
 }
 
+.anime-card button {
+  padding: 10px 16px;
+  margin: 4px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+}
+
+.edit-button {
+  background-color: #2458a6;
+}
+
+.delete-button {
+  background-color: #b42318;
+}
+
+/* Shared button behaviour */
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(0.9);
+}
+
+button:focus-visible {
+  outline: 3px solid #222;
+  outline-offset: 3px;
+}
+
+/* Shared popup appearance */
+#edit-dialog,
+#delete-dialog {
+  width: 360px;
+  max-width: calc(100% - 40px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  border: none;
+  border-radius: 12px;
+}
+
+#edit-dialog::backdrop,
+#delete-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Edit popup */
+#edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#edit-form input,
+#edit-form select,
+#edit-form button {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#edit-form button[type="submit"] {
+  background-color: #2458a6;
+  color: white;
+  border: none;
+}
+
+/* Delete popup */
+#delete-dialog {
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+#delete-dialog button {
+  padding: 10px 16px;
+  margin: 4px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#delete-dialog #confirm-delete {
+  background-color: #b42318;
+  color: white;
+  border: none;
+}
+
+/* Mobile layout */
 @media (max-width: 600px) {
   #anime-form {
     flex-direction: column;
-  }
-
-  #anime-form input,
-  #anime-form select,
-  #anime-form button {
-    padding: 10px;
+    align-items: stretch;
   }
 }

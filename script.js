@@ -1,25 +1,38 @@
 const animeList = JSON.parse(localStorage.getItem("animeList")) || [];
 
+// Main form elements
 const animeForm = document.querySelector("#anime-form");
 const titleInput = document.querySelector("#anime-title");
 const statusInput = document.querySelector("#anime-status");
 const ratingInput = document.querySelector("#anime-rating");
 const listContainer = document.querySelector("#anime-list");
-const submitButton = document.querySelector("#submit-button");
+
+// Edit popup elements
+const editDialog = document.querySelector("#edit-dialog");
+const editForm = document.querySelector("#edit-form");
+const editTitle = document.querySelector("#edit-title");
+const editStatus = document.querySelector("#edit-status");
+const editRating = document.querySelector("#edit-rating");
+const cancelEdit = document.querySelector("#cancel-edit");
+
+// Delete popup elements
+const deleteDialog = document.querySelector("#delete-dialog");
+const deleteMessage = document.querySelector("#delete-message");
+const cancelDelete = document.querySelector("#cancel-delete");
+const confirmDelete = document.querySelector("#confirm-delete");
 
 let editingId = null;
+let animeToDelete = null;
 
 // Save the list in the browser.
 function saveAnime() {
   localStorage.setItem("animeList", JSON.stringify(animeList));
 }
 
-// Return the form to adding mode.
+// Reset the Add Anime form.
 function resetForm() {
-  editingId = null;
   animeForm.reset();
   titleInput.setCustomValidity("");
-  submitButton.textContent = "Add Anime";
 }
 
 // Add one anime to the array.
@@ -34,20 +47,19 @@ function addAnime(title, status, rating) {
   animeList.push(anime);
 }
 
-// Fill the form with the selected anime's details.
+// Open and fill the Edit popup.
 function editAnime(anime) {
   editingId = anime.id;
 
-  titleInput.value = anime.title;
-  statusInput.value = anime.status;
-  ratingInput.value = anime.rating;
+  editTitle.value = anime.title;
+  editStatus.value = anime.status;
+  editRating.value = anime.rating;
 
-  titleInput.setCustomValidity("");
-  submitButton.textContent = "Save Changes";
-  titleInput.focus();
+  editTitle.setCustomValidity("");
+  editDialog.showModal();
 }
 
-// Update an existing anime's details.
+// Apply changes to the selected anime.
 function updateAnime(title, status, rating) {
   const anime = animeList.find(function (item) {
     return item.id === editingId;
@@ -60,23 +72,17 @@ function updateAnime(title, status, rating) {
   anime.rating = rating;
 }
 
-// Remove the selected anime.
+// Open the Delete confirmation popup.
 function deleteAnime(anime) {
-  const index = animeList.indexOf(anime);
+  animeToDelete = anime;
 
-  if (index === -1) return;
+  deleteMessage.textContent =
+    'Delete "' + anime.title + '" from your list?';
 
-  animeList.splice(index, 1);
-
-  if (editingId === anime.id) {
-    resetForm();
-  }
-
-  saveAnime();
-  displayAnime();
+  deleteDialog.showModal();
 }
 
-// Create one card and its buttons.
+// Create one anime card.
 function createAnimeCard(anime) {
   const card = document.createElement("div");
   card.className = "anime-card";
@@ -92,6 +98,7 @@ function createAnimeCard(anime) {
     "Rating: " + (anime.rating === "" ? "Not rated" : anime.rating + "/10");
 
   const editButton = document.createElement("button");
+  editButton.className = "edit-button";
   editButton.type = "button";
   editButton.textContent = "Edit";
 
@@ -100,6 +107,7 @@ function createAnimeCard(anime) {
   });
 
   const deleteButton = document.createElement("button");
+  deleteButton.className = "delete-button";
   deleteButton.type = "button";
   deleteButton.textContent = "Delete";
 
@@ -126,7 +134,7 @@ function displayAnime() {
   });
 }
 
-// GET: request data from the practice API.
+// GET: retrieve a sample record.
 async function getData() {
   const response = await axios.get(
     "https://jsonplaceholder.typicode.com/posts/1"
@@ -135,8 +143,8 @@ async function getData() {
   console.log(response.data);
 }
 
-// POST: send anime details to the practice API.
-// This API simulates saving; localStorage saves your actual list.
+// POST: send details to the practice API.
+// This simulates saving; localStorage saves the actual list.
 async function postData(title, status, rating) {
   const response = await axios.post(
     "https://jsonplaceholder.typicode.com/posts",
@@ -150,7 +158,7 @@ async function postData(title, status, rating) {
   console.log(response.data);
 }
 
-// Add or update an anime when the form is submitted.
+// Add an anime when the main form is submitted.
 animeForm.addEventListener("submit", function (event) {
   event.preventDefault();
 
@@ -162,16 +170,12 @@ animeForm.addEventListener("submit", function (event) {
     return;
   }
 
-  if (editingId === null) {
-    addAnime(title, statusInput.value, ratingInput.value);
+  addAnime(title, statusInput.value, ratingInput.value);
 
-    postData(title, statusInput.value, ratingInput.value)
-      .catch(function (error) {
-        console.error("POST failed:", error);
-      });
-  } else {
-    updateAnime(title, statusInput.value, ratingInput.value);
-  }
+  postData(title, statusInput.value, ratingInput.value)
+    .catch(function (error) {
+      console.error("POST failed:", error);
+    });
 
   saveAnime();
   displayAnime();
@@ -179,15 +183,76 @@ animeForm.addEventListener("submit", function (event) {
   titleInput.focus();
 });
 
-// Clear the custom error when the title is edited.
+// Clear the main title error when typing.
 titleInput.addEventListener("input", function () {
   titleInput.setCustomValidity("");
 });
 
-// Display saved anime when the page opens.
+// Save changes from the Edit popup.
+editForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  const title = editTitle.value.trim();
+
+  if (title === "") {
+    editTitle.setCustomValidity("Please enter an anime title.");
+    editTitle.reportValidity();
+    return;
+  }
+
+  updateAnime(title, editStatus.value, editRating.value);
+
+  saveAnime();
+  displayAnime();
+  editDialog.close();
+});
+
+// Clear the Edit title error when typing.
+editTitle.addEventListener("input", function () {
+  editTitle.setCustomValidity("");
+});
+
+// Cancel editing.
+cancelEdit.addEventListener("click", function () {
+  editDialog.close();
+});
+
+// Clean up after Save, Cancel, or Escape.
+editDialog.addEventListener("close", function () {
+  editingId = null;
+  editForm.reset();
+  editTitle.setCustomValidity("");
+});
+
+// Delete only after confirmation.
+confirmDelete.addEventListener("click", function () {
+  if (animeToDelete === null) return;
+
+  const index = animeList.indexOf(animeToDelete);
+
+  if (index !== -1) {
+    animeList.splice(index, 1);
+    saveAnime();
+    displayAnime();
+  }
+
+  deleteDialog.close();
+});
+
+// Cancel deletion.
+cancelDelete.addEventListener("click", function () {
+  deleteDialog.close();
+});
+
+// Clear the selection after closing or pressing Escape.
+deleteDialog.addEventListener("close", function () {
+  animeToDelete = null;
+});
+
+// Display saved anime on page load.
 displayAnime();
 
-// Run the GET request when the page opens.
+// Run GET on page load.
 getData().catch(function (error) {
   console.error("GET failed:", error);
 });
