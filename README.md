@@ -22,3 +22,9 @@ have completed, or plan to watch.
 Open index.html in a browser.
 Fill in the form and click Add Anime.
 Use Edit to change an entry or Delete to remove it.
+
+## Setup and Run
+- npm init -y
+- npm install axios
+- python -m http.server
+- Open http://localhost:8000 in your browser.
